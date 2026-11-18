@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>سایت من</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #1c1b19;
+      --surface: #252320;
+      --border: #36332e;
+      --text: #ececec;
+      --muted: #8b909a;
+      --accent: #c9a96e;
+      --accent-soft: rgba(201, 169, 110, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Vazirmatn", Tahoma, sans-serif;
+      font-weight: 300;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.9;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ---------- منو ---------- */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      padding: 0 20px;
+    }
+
+    .nav-inner {
+      max-width: 960px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 0;
+      position: relative;
+    }
+
+    .brand {
+      font-size: 1.1rem;
+      font-weight: 400;
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 6px;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .nav-links a {
+      display: block;
+      padding: 6px 12px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.92rem;
+      border-bottom: 2px solid transparent;
+      transition: color 0.25s ease, border-color 0.25s ease;
+    }
+
+    .nav-links a:hover { color: var(--text); }.nav-links a.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+
+    /* دکمه‌ی همبرگری (فقط در موبایل) */
+    .menu-toggle {
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      gap: 5px;
+      width: 40px;
+      height: 40px;
+      padding: 8px;
+      background: transparent;
+      border: none;
+      border-radius: 0;
+      cursor: pointer;
+    }
+
+    .menu-toggle:hover, .menu-toggle:active {
+      background: transparent;
+      border: none;
+      transform: none;
+    }
+
+    .menu-toggle span {
+      display: block;
+      width: 24px;
+      height: 2px;
+      background: var(--accent);
+      margin: 0 auto;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+
+    .menu-toggle.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .menu-toggle.open span:nth-child(2) { opacity: 0; }
+    .menu-toggle.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    /* ---------- صفحات ---------- */
+    main {
+      flex: 1;
+      width: 100%;
+      max-width: 720px;
+      margin: 48px auto;
+      padding: 0 20px;
+    }
+
+    .page { display: none; }
+    .page.show { display: block; animation: fade 0.4s ease; }
+
+    @keyframes fade {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: none; }
+    }
+
+    .page-title {
+      font-size: 1.7rem;
+      font-weight: 400;
+      margin: 0 0 8px;
+    }
+
+    .page-sub {
+      color: var(--muted);
+      margin: 0 0 32px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 36px;
+      margin-bottom: 24px;
+      transition: border-color 0.3s ease;
+    }
+
+    .card:hover { border-color: var(--accent); }
+
+    .card h2 {
+      margin: 0 0 12px;
+      font-size: 1.25rem;
+      font-weight: 400;
+      color: var(--accent);
+    }
+
+    .card p {
+      color: var(--muted);
+      margin: 0 0 24px;
+    }
+
+    .card p:last-child { margin-bottom: 0; }
+
+    .card a {
+      color: var(--accent);
+      text-decoration: none;
+      direction: ltr;
+      unicode-bidi: embed;
+    }
+
+    .card a:hover { text-decoration: underline; }
+
+    /* ---------- فرم ---------- */
+    label {
+      display: block;
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-bottom: 6px;
+    }
+
+    input, textarea {
+      width: 100%;
+      background: var(--bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-family: inherit;
+      font-size: 0.95rem;
+      margin-bottom: 18px;
+      outline: none;
+      transition: border-color 0.25s ease;
+    }
+
+    input:focus, textarea:focus { border-color: var(--accent); }
+
+    textarea { min-height: 120px; resize: vertical; }
+
+    /* ---------- دکمه ---------- */
+    button {
+      background: transparent;
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      padding: 10px 28px;
+      border-radius: 999px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 400;
+      transition: background 0.3s ease, color 0.3s ease, transform 0.1s ease;
+    }
+
+    button:hover {
+      background: var(--accent);
+      color: var(--bg);
+    }
+
+    button:active { transform: scale(0.97); }
+
+    #message, #form-msg {
+      margin-top: 20px;
+      min-height: 1.5em;
+      color: var(--accent);
+      font-weight: 400;
+    }
+
+    /* ---------- نمونه کارها ---------- */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+    }
+
+    .grid .card { margin-bottom: 0; }
+
+    /* ---------- فوتر ---------- */
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.85rem;
+      padding: 28px 20px;
+      border-top: 1px solid var(--border);
+    }
+
+    /* ---------- موبایل ---------- */
+    @media (max-width: 700px) {
+      .menu-toggle { display: flex; }.nav-links {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: -20px;
+        right: -20px;
+        flex-direction: column;
+        gap: 0;
+        background: var(--bg);
+        border-bottom: 1px solid var(--border);
+        padding: 8px 20px 12px;
+      }
+
+      .nav-links.open { display: flex; }
+
+      .nav-links a {
+        padding: 12px 0;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .nav-links li:last-child a { border-bottom: none; }
+
+      .nav-links a.active { border-bottom-color: var(--accent); }
+
+      .card { padding: 24px; }
+      .page-title { font-size: 1.4rem; }
+      main { margin: 32px auto; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="nav-inner">
+      <a href="#home" class="brand">سایت من</a>
+
+      <button class="menu-toggle" id="menuToggle" aria-label="باز و بسته کردن منو" aria-expanded="false">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <ul class="nav-links" id="navLinks">
+        <li><a href="#home">خانه</a></li>
+        <li><a href="#portfolio">نمونه کارها</a></li>
+        <li><a href="#connect">ارتباط</a></li>
+        <li><a href="#contact">تماس</a></li>
+        <li><a href="#about">درباره ما</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main>
+
+    <!-- خانه -->
+    <section id="home" class="page">
+      <h1 class="page-title">به سایت من خوش آمدید</h1>
+      <p class="page-sub">سادگی، ظرافت، و جزئیات دقیق</p>
+      <section class="card">
+        <h2>معرفی</h2>
+        <p>این یک کارت نمونه است. هر بخش جدید سایت به همین شکل به صفحه اضافه می‌شه.</p>
+        <button onclick="sayHello()">کلیک کن</button>
+        <p id="message"></p>
+      </section>
+    </section>
+
+    <!-- نمونه کارها -->
+    <section id="portfolio" class="page">
+      <h1 class="page-title">نمونه کارها</h1>
+      <p class="page-sub">چند نمونه از کارهایی که انجام داده‌ایم</p>
+      <div class="grid">
+        <div class="card">
+          <h2>پروژه اول</h2>
+          <p>توضیح کوتاه درباره‌ی این پروژه.</p>
+        </div>
+        <div class="card">
+          <h2>پروژه دوم</h2>
+          <p>توضیح کوتاه درباره‌ی این پروژه.</p>
+        </div>
+        <div class="card">
+          <h2>پروژه سوم</h2>
+          <p>توضیح کوتاه درباره‌ی این پروژه.</p>
+        </div>
+      </div>
+    </section><!-- ارتباط -->
+    <section id="connect" class="page">
+      <h1 class="page-title">ارتباط با ما</h1>
+      <p class="page-sub">از راه‌های زیر می‌تونی با ما در ارتباط باشی</p>
+      <section class="card">
+        <h2>اطلاعات تماس</h2>
+        <p>ایمیل: <a href="mailto:im.victor.128@gmail.com">im.victor.128@gmail.com</a></p>
+        <p>تلگرام: <a href="https://t.me/ShadowVoidLab" target="_blank" rel="noopener">@ItsShadow_77</a></p>
+      </section>
+    </section>
+
+    <!-- تماس -->
+    <section id="contact" class="page">
+      <h1 class="page-title">تماس با ما</h1>
+      <p class="page-sub">پیامت رو بفرست تا در اولین فرصت جواب بدیم</p>
+      <section class="card">
+        <form onsubmit="handleForm(event)">
+          <label for="name">نام</label>
+          <input type="text" id="name" required>
+          <label for="email">ایمیل</label>
+          <input type="email" id="email" required>
+          <label for="text">پیام</label>
+          <textarea id="text" required></textarea>
+          <button type="submit">ارسال پیام</button>
+          <p id="form-msg"></p>
+        </form>
+      </section>
+    </section>
+
+    <!-- درباره ما -->
+    <section id="about" class="page">
+      <h1 class="page-title">درباره ما</h1>
+      <p class="page-sub">کمی درباره‌ی ما و هدفمون</p>
+      <section class="card">
+        <h2>داستان ما</h2>
+        <p>این بخش رو می‌تونی با متن واقعی خودت پر کنی. معرفی تیم، تاریخچه و ارزش‌هایی که دنبالشون هستید.</p>
+      </section>
+    </section>
+
+  </main>
+
+  <footer>
+    © ۱۴۰۴ تمامی حقوق محفوظ است.
+  </footer>
+
+  <script>
+    // ---------- منوی همبرگری ----------
+    const menuToggle = document.getElementById("menuToggle");
+    const navLinks = document.getElementById("navLinks");
+
+    menuToggle.addEventListener("click", () => {
+      const isOpen = navLinks.classList.toggle("open");
+      menuToggle.classList.toggle("open", isOpen);
+      menuToggle.setAttribute("aria-expanded", isOpen);
+    });
+
+    // ---------- نمایش صفحه بر اساس آدرس ----------
+    const pages = document.querySelectorAll(".page");
+    const links = document.querySelectorAll(".nav-links a");
+
+    function showPage() {
+      const id = location.hash.replace("#", "") || "home";
+      const target = document.getElementById(id);
+      const valid = target && target.classList.contains("page") ? target : document.getElementById("home");
+
+      pages.forEach(p => p.classList.remove("show"));
+      valid.classList.add("show");
+
+      links.forEach(a => {
+        a.classList.toggle("active", a.getAttribute("href") === "#" + valid.id);
+      });
+
+      // بستن منوی موبایل بعد از انتخاب بخش
+      navLinks.classList.remove("open");
+      menuToggle.classList.remove("open");
+      menuToggle.setAttribute("aria-expanded", "false");
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    window.addEventListener("hashchange", showPage);
+    showPage();
+
+    // ---------- توابع نمونه ----------
+    function sayHello() {
+      document.getElementById("message").textContent = "سلام! دکمه کار کرد.";
+    }
+
+    function handleForm(e) {
+      e.preventDefault();
+      document.getElementById("form-msg").textContent = "پیامت ثبت شد! (فعلاً فقط نمایشی است)";
+      e.target.reset();
+    }
+  </script>
+</body>
+</html>
