@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>سایت من</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#1c1b19; --surface:#252320; --border:#36332e;
+    --text:#ececec; --muted:#8b909a; --accent:#c9a96e;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin:0; font-family:"Vazirmatn",Tahoma,sans-serif; font-weight:300;
+    background:var(--bg); color:var(--text); line-height:1.9;
+    min-height:100vh; display:flex; flex-direction:column;
+  }
+  nav { position:sticky; top:0; z-index:100; background:var(--bg); border-bottom:1px solid var(--border); padding:0 20px; }
+  .nav-inner { max-width:960px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; padding:14px 0; position:relative; }
+  .brand { font-size:1.1rem; font-weight:400; color:var(--accent); text-decoration:none; }
+  .nav-links { display:flex; gap:6px; list-style:none; margin:0; padding:0; }
+  .nav-links a { display:block; padding:6px 12px; color:var(--muted); text-decoration:none; font-size:.92rem; border-bottom:2px solid transparent; transition:color .25s,border-color .25s; }
+  .nav-links a:hover { color:var(--text); }
+  .nav-links a.active { color:var(--accent); border-bottom-color:var(--accent); }
+
+  .menu-toggle { display:none; flex-direction:column; justify-content:center; gap:5px; width:40px; height:40px; padding:8px; background:transparent; border:none; cursor:pointer; }
+  .menu-toggle span { display:block; width:24px; height:2px; background:var(--accent); margin:0 auto; transition:transform .3s,opacity .3s; }
+  .menu-toggle.open span:nth-child(1) { transform:translateY(7px) rotate(45deg); }
+  .menu-toggle.open span:nth-child(2) { opacity:0; }
+  .menu-toggle.open span:nth-child(3) { transform:translateY(-7px) rotate(-45deg); }
+
+  main { flex:1; width:100%; max-width:720px; margin:48px auto; padding:0 20px; }
+  .page { display:none; }
+  .page.show { display:block; animation:fade .4s ease; }
+  @keyframes fade { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:none} }
+
+  .page-title { font-size:1.7rem; font-weight:400; margin:0 0 8px; }
+  .page-sub { color:var(--muted); margin:0 0 32px; }
+
+  .card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:36px; margin-bottom:24px; transition:border-color .3s; }
+  .card:hover { border-color:var(--accent); }
+  .card h2 { margin:0 0 12px; font-size:1.25rem; font-weight:400; color:var(--accent); }
+  .card p { color:var(--muted); margin:0 0 16px; }
+  .card p:last-child { margin-bottom:0; }
+  .card a { color:var(--accent); text-decoration:none; direction:ltr; unicode-bidi:embed; }
+  .card a:hover { text-decoration:underline; }
+  .card img { width:100%; border-radius:8px; margin-bottom:12px; display:block; }
+
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:20px; }
+  .grid .card { margin-bottom:0; }
+
+  label { display:block; color:var(--muted); font-size:.9rem; margin-bottom:6px; }
+  input, textarea { width:100%; background:var(--bg); color:var(--text); border:1px solid var(--border); border-radius:8px; padding:10px 14px; font-family:inherit; font-size:.95rem; margin-bottom:18px; outline:none; }
+  input:focus, textarea:focus { border-color:var(--accent); }
+  textarea { min-height:120px; resize:vertical; }
+
+  button { background:transparent; color:var(--accent); border:1px solid var(--accent); padding:10px 28px; border-radius:999px; cursor:pointer; font-family:inherit; font-size:.95rem; transition:background .3s,color .3s; }
+  button:hover { background:var(--accent); color:var(--bg); }
+  #form-msg { margin-top:16px; min-height:1.5em; color:var(--accent); }
+
+  footer { text-align:center; color:var(--muted); font-size:.85rem; padding:28px 20px; border-top:1px solid var(--border); }@media (max-width:700px) {
+    .menu-toggle { display:flex; }
+    .nav-links { display:none; position:absolute; top:100%; left:-20px; right:-20px; flex-direction:column; gap:0; background:var(--bg); border-bottom:1px solid var(--border); padding:8px 20px 12px; }
+    .nav-links.open { display:flex; }
+    .nav-links a { padding:12px 0; border-bottom:1px solid var(--border); }
+    .nav-links li:last-child a { border-bottom:none; }
+    .card { padding:24px; }
+    .page-title { font-size:1.4rem; }
+    main { margin:32px auto; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="#home" class="brand" id="brandName">سایت من</a>
+    <button class="menu-toggle" id="menuToggle" aria-label="منو" aria-expanded="false"><span></span><span></span><span></span></button>
+    <ul class="nav-links" id="navLinks">
+      <li data-key="home"><a href="#home">خانه</a></li>
+      <li data-key="portfolio"><a href="#portfolio">نمونه کارها</a></li>
+      <li data-key="connect"><a href="#connect">ارتباط</a></li>
+      <li data-key="contact"><a href="#contact">تماس</a></li>
+      <li data-key="about"><a href="#about">درباره ما</a></li>
+    </ul>
+  </div>
+</nav>
+
+<main>
+  <section id="home" class="page">
+    <h1 class="page-title" id="heroTitle"></h1>
+    <p class="page-sub" id="heroSub"></p>
+    <section class="card">
+      <h2 id="introTitle"></h2>
+      <p id="introText"></p>
+    </section>
+  </section>
+
+  <section id="portfolio" class="page">
+    <h1 class="page-title" id="portfolioTitle"></h1>
+    <p class="page-sub" id="portfolioSub"></p>
+    <div class="grid" id="projectsGrid"></div>
+  </section>
+
+  <section id="connect" class="page">
+    <h1 class="page-title" id="connectTitle"></h1>
+    <p class="page-sub" id="connectSub"></p>
+    <section class="card" id="contactInfo"></section>
+  </section>
+
+  <section id="contact" class="page">
+    <h1 class="page-title" id="formTitle"></h1>
+    <p class="page-sub" id="formSub"></p>
+    <section class="card">
+      <form id="contactForm">
+        <label for="name">نام</label>
+        <input type="text" id="name" required>
+        <label for="email">ایمیل</label>
+        <input type="email" id="email" required>
+        <label for="text">پیام</label>
+        <textarea id="text" required></textarea>
+        <button type="submit">ارسال پیام</button>
+        <p id="form-msg"></p>
+      </form>
+    </section>
+  </section>
+
+  <section id="about" class="page">
+    <h1 class="page-title" id="aboutTitle"></h1>
+    <p class="page-sub" id="aboutSub"></p>
+    <section class="card">
+      <h2 id="aboutCardTitle"></h2>
+      <p id="aboutText"></p>
+    </section>
+  </section>
+</main>
+
+<footer id="footerText"></footer>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, doc, getDoc, collection, getDocs, addDoc, query, orderBy }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  // ⚠️ مقادیر firebaseConfig پروژه‌ات را اینجا بگذار
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "shadow-vic.firebaseapp.com",
+    projectId: "shadow-vic",
+    storageBucket: "shadow-vic.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+  };
+
+  const db = getFirestore(initializeApp(firebaseConfig));
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s ?? "").replace(/[&<>"']/g, c =>
+    ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+
+  const DEFAULTS = {
+    brandName: "سایت من",
+    heroTitle: "به سایت من خوش آمدید",
+    heroSub: "سادگی، ظرافت، و جزئیات دقیق",
+    introTitle: "معرفی",
+    introText: "این بخش را از پنل مدیریت ویرایش کن.",
+    portfolioTitle: "نمونه کارها",
+    portfolioSub: "چند نمونه از کارهایی که انجام داده‌ایم",
+    connectTitle: "ارتباط با ما",
+    connectSub: "از راه‌های زیر می‌توانی با ما در ارتباط باشی",
+    email: "im.victor.128@gmail.com",
+    telegram: "ItsShadow_77",
+    formTitle: "تماس با ما",
+    formSub: "پیامت را بفرست تا در اولین فرصت جواب بدهیم",
+    aboutTitle: "درباره ما",
+    aboutSub: "کمی درباره‌ی ما و هدفمان",
+    aboutCardTitle: "داستان ما",
+    aboutText: "این بخش را می‌توانی با متن واقعی خودت پر کنی.",
+>footerText: "© ۱۴۰۴ تمامی حقوق محفوظ است.",
+    sections: { home:true, portfolio:true, connect:true, contact:true, about:true }
+  };
+
+  // ---------- منوی همبرگری ----------
+  const menuToggle = $("menuToggle");
+  const navLinks = $("navLinks");
+  menuToggle.addEventListener("click", () => {
+    const isOpen = navLinks.classList.toggle("open");
+    menuToggle.classList.toggle("open", isOpen);
+    menuToggle.setAttribute("aria-expanded", isOpen);
+  });
+
+  // ---------- نمایش صفحه بر اساس هش ----------
+  function showPage() {
+    const id = location.hash.replace("#", "") || "home";
+    const t = document.getElementById(id);
+    const valid = t && t.classList.contains("page") && !t.hidden ? t : $("home");
+    document.querySelectorAll(".page").forEach(p => p.classList.remove("show"));
+    valid.classList.add("show");
+    document.querySelectorAll(".nav-links a").forEach(a =>
+      a.classList.toggle("active", a.getAttribute("href") === "#" + valid.id));
+    navLinks.classList.remove("open");
+    menuToggle.classList.remove("open");
+    menuToggle.setAttribute("aria-expanded", "false");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+  window.addEventListener("hashchange", showPage);
+
+  // ---------- خواندن و نمایش محتوا از Firestore ----------
+  async function renderSite() {
+    let m = {};
+    try {
+      const snap = await getDoc(doc(db, "site", "main"));
+      if (snap.exists()) m = snap.data();
+    } catch (e) { console.error(e); }
+
+    const c = { ...DEFAULTS, ...m, sections: { ...DEFAULTS.sections, ...(m.sections || {}) } };
+
+    ["brandName","heroTitle","heroSub","introTitle","introText","portfolioTitle","portfolioSub",
+     "connectTitle","connectSub","formTitle","formSub","aboutTitle","aboutSub",
+     "aboutCardTitle","aboutText","footerText"]
+      .forEach(k => $(k === "brandName" ? "brandName" : k).textContent = c[k]);
+
+    $("contactInfo").innerHTML = 
+      <h2>اطلاعات تماس</h2>
+      ${c.email ? <p>ایمیل: <a href="mailto:${esc(c.email)}">${esc(c.email)}</a></p> : ""}
+      ${c.telegram ? <p>تلگرام: <a href="https://t.me/${esc(c.telegram)}" target="_blank" rel="noopener">@${esc(c.telegram)}</a></p> : ""};
+
+    // نمایش یا مخفی کردن بخش‌ها
+    Object.entries(c.sections).forEach(([key, show]) => {
+      const li = document.querySelector(.nav-links li[data-key="${key}"]);
+      if (li) li.style.display = show ? "" : "none";
+      const sec = $(key);
+      if (sec) sec.hidden = !show;
+    });
+
+    // نمونه کارها
+    let projects = [];
+    try {
+      const snap = await getDocs(query(collection(db, "projects"), orderBy("order")));
+      projects = snap.docs.map(d => ({ id: d.id, ...d.data() })).filter(p => p.visible !== false);
+    } catch (e) { console.error(e); }
+
+    $("projectsGrid").innerHTML = projects.map(p => 
+      <div class="card">
+        ${p.image ? <img src="${p.image}" alt="${esc(p.title)}"> : ""}
+        <h2>${esc(p.title)}</h2>
+        <p>${esc(p.description)}</p>
+        ${p.link ? <a href="${esc(p.link)}" target="_blank" rel="noopener">مشاهده</a> : ""}
+      </div>).join("");
+
+    showPage();
+  }
+
+  // ---------- فرم تماس (ذخیره در Firestore) ----------
+  $("contactForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const msg = $("form-msg");
+    msg.textContent = "در حال ارسال...";
+    try {
+      await addDoc(collection(db, "messages"), {
+        name: $("name").value.trim(),
+        email: $("email").value.trim(),
+        text: $("text").value.trim(),
+        createdAt: new Date()
+      });
+      msg.textContent = "پیامت ثبت شد! ✅";
+      e.target.reset();
+    } catch (err) {
+      console.error(err);
+      msg.textContent = "خطا در ارسال. دوباره تلاش کن.";
+    }
+  });
+
+  renderSite();
+</script>
+</body>
+</html

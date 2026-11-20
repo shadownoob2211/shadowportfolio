@@ -1,0 +1,314 @@
+$("panel").classList.toggle("hidden", !isAdmin);
+    if (user && !isAdmin) {
+      $("loginMsg").textContent = "این حساب دسترسی مدیر ندارد.";
+      await signOut(auth);
+      return;
+    }
+    if (isAdmin) {
+      await loadMain();
+      await loadProjectList();
+      await loadMessageList();
+    }
+  });
+
+  // ---------- تنظیمات کلی ----------
+  const textFields = ["brandName","heroTitle","heroSub","introTitle","introText",
+    "portfolioTitle","portfolioSub","connectTitle","connectSub","email","telegram",
+    "formTitle","formSub","aboutTitle","aboutSub","aboutCardTitle","aboutText","footerText"];
+  const sectionKeys = ["home","portfolio","connect","contact","about"];
+
+  async function loadMain() {
+    const snap = await getDoc(doc(db, "site", "main"));
+    const m = snap.exists() ? snap.data() : {};
+    textFields.forEach(f => $(f).value = m[f] ?? "");
+    sectionKeys.forEach(k => $("s_" + k).checked = m.sections?.[k] !== false);
+  }
+
+  $("saveMain").addEventListener("click", async () => {
+    const data = {};
+    textFields.forEach(f => data[f] = $(f).value.trim());
+    data.sections = {};
+    sectionKeys.forEach(k => data.sections[k] = $("s_" + k).checked);
+    $("mainMsg").textContent = "در حال ذخیره...";
+    try {
+      await setDoc(doc(db, "site", "main"), data, { merge: true });
+      $("mainMsg").textContent = "ذخیره شد ✅";
+    } catch (e) {
+      console.error(e);
+      $("mainMsg").textContent = "خطا در ذخیره.";
+    }
+  });
+
+  // ---------- نمونه کارها ----------
+  async function loadProjectList() {
+    const snap = await getDocs(query(collection(db, "projects"), orderBy("order")));
+    const list = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    $("projectList").innerHTML = list.length ? list.map(p => 
+      <div class="item" data-id="${p.id}">
+        ${p.image ? <img src="${p.image}" alt=""> : ""}
+        <label>عنوان</label><input class="e-title" value="${esc(p.title)}">
+        <label>توضیح</label><textarea class="e-desc">${esc(p.description)}</textarea>
+        <label>لینک</label><input class="e-link" value="${esc(p.link)}">
+        <label>ترتیب</label><input class="e-order" type="number" value="${p.order ?? 0}">
+        <label class="checks" style="color:var(--text);display:flex;align-items:center;">
+          <input type="checkbox" class="e-visible" style="width:auto;margin:0 6px 0 0;" ${p.visible !== false ? "checked" : ""}> نمایش در سایت
+        </label>
+        <div class="row">
+          <button class="save-p">ذخیره</button>
+          <button class="danger del-p">حذف</button>
+        </div>
+        <p class="msg p-msg"></p>
+      </div>).join("") : <p class="small">هنوز نمونه‌کاری ثبت نشده.</p>;
+  }
+
+  $("addProjectBtn").addEventListener("click", async () => {
+    const title = $("pTitle").value.trim();
+    if (!title) { $("pMsg").textContent = "عنوان را وارد کن."; return; }
+    $("pMsg").textContent = "در حال ذخیره...";
+    try {
+      let image = "";
+      const file = $("pFile").files[0];
+      if (file) image = await compressImage(file);
+      if (image.length > 900000) {
+        $("pMsg").textContent = "عکس خیلی بزرگ است. عکس کوچک‌تری انتخاب کن.";
+        return;
+      }
+      await addDoc(collection(db, "projects"), {
+        title,
+        description: $("pDesc").value.trim(),
+        link: $("pLink").value.trim(),
+        order: Number($("pOrder").value) || 0,
+        visible: true,
+        image
+      });
+      ["pTitle","pDesc","pLink"].forEach(id => $(id).value = "");
+      $("pOrder").value = 0;
+      $("pFile").value = "";
+      $("pMsg").textContent = "نمونه کار اضافه شد ✅";
+      await loadProjectList();
+    } catch (e) {
+      console.error(e);
+      $("pMsg").textContent = "خطا در افزودن.";
+    }
+  });
+
+  $("projectList").addEventListener("click", async (e) => {
+    const item = e.target.closest(".item");
+    if (!item) return;
+    const ref = doc(db, "projects", item.dataset.id);
+    const msg = item.querySelector(".p-msg");<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>پنل مدیریت</title>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#1c1b19; --surface:#252320; --border:#36332e; --text:#ececec; --muted:#8b909a; --accent:#c9a96e; --danger:#e07a7a; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:"Vazirmatn",Tahoma,sans-serif; background:var(--bg); color:var(--text); padding:16px; line-height:1.8; }
+  .wrap { max-width:800px; margin:0 auto; }
+  h1, h2 { color:var(--accent); font-weight:400; }
+  h2 { font-size:1.2rem; margin:0 0 12px; }
+  .box { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px; margin-bottom:20px; }
+  label { display:block; color:var(--muted); font-size:.9rem; margin:10px 0 4px; }
+  input, textarea { width:100%; background:var(--bg); color:var(--text); border:1px solid var(--border); border-radius:8px; padding:9px 12px; font-family:inherit; font-size:.95rem; margin-bottom:6px; }
+  input[type=checkbox] { width:auto; margin:0 6px 0 0; }
+  textarea { min-height:80px; resize:vertical; }
+  button { background:transparent; color:var(--accent); border:1px solid var(--accent); padding:9px 22px; border-radius:999px; cursor:pointer; font-family:inherit; font-size:.95rem; margin:8px 6px 0 0; }
+  button:hover { background:var(--accent); color:var(--bg); }
+  button.danger { color:var(--danger); border-color:var(--danger); }
+  button.danger:hover { background:var(--danger); color:var(--bg); }
+  .hidden { display:none !important; }
+  .msg { color:var(--accent); min-height:1.4em; margin:10px 0 0; }
+  .small { color:var(--muted); font-size:.85rem; }
+  .item { border-bottom:1px solid var(--border); padding:14px 0; }
+  .item:last-child { border-bottom:none; }
+  .item img { width:100%; max-width:240px; border-radius:8px; display:block; margin-bottom:8px; }
+  .checks label { display:flex; align-items:center; color:var(--text); margin:6px 0; }
+  .row { display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:space-between; }
+  @media (max-width:600px) { .box { padding:16px; } button { width:100%; } .row button { width:auto; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ورود -->
+  <section id="loginBox" class="box">
+    <h2>ورود مدیر</h2>
+    <label for="loginEmail">ایمیل</label>
+    <input type="email" id="loginEmail" autocomplete="username">
+    <label for="loginPass">رمز</label>
+    <input type="password" id="loginPass" autocomplete="current-password">
+    <button id="loginBtn">ورود</button>
+    <p class="msg" id="loginMsg"></p>
+  </section>
+
+  <!-- پنل -->
+  <div id="panel" class="hidden">
+    <div class="row" style="margin-bottom:20px;">
+      <h1 style="margin:0;font-size:1.4rem;">پنل مدیریت</h1>
+      <button id="logoutBtn">خروج</button>
+    </div>
+
+    <section class="box">
+      <h2>تنظیمات کلی</h2>
+      <label>نام برند</label><input id="brandName">
+      <label>عنوان صفحه‌ی خانه</label><input id="heroTitle">
+      <label>زیرعنوان خانه</label><input id="heroSub">
+      <label>عنوان کارت معرفی</label><input id="introTitle">
+      <label>متن معرفی</label><textarea id="introText"></textarea>
+      <label>عنوان نمونه کارها</label><input id="portfolioTitle">
+      <label>زیرعنوان نمونه کارها</label><input id="portfolioSub">
+      <label>عنوان ارتباط</label><input id="connectTitle">
+      <label>زیرعنوان ارتباط</label><input id="connectSub">
+      <label>ایمیل</label><input id="email">
+      <label>تلگرام (بدون @)</label><input id="telegram">
+      <label>عنوان تماس</label><input id="formTitle">
+      <label>زیرعنوان تماس</label><input id="formSub">
+      <label>عنوان درباره ما</label><input id="aboutTitle">
+      <label>زیرعنوان درباره ما</label><input id="aboutSub">
+      <label>عنوان کارت درباره ما</label><input id="aboutCardTitle">
+      <label>متن درباره ما</label><textarea id="aboutText"></textarea>
+      <label>متن فوتر</label><input id="footerText"><h2 style="margin-top:20px;">نمایش بخش‌ها</h2>
+      <div class="checks">
+        <label><input type="checkbox" id="s_home"> خانه</label>
+        <label><input type="checkbox" id="s_portfolio"> نمونه کارها</label>
+        <label><input type="checkbox" id="s_connect"> ارتباط</label>
+        <label><input type="checkbox" id="s_contact"> تماس</label>
+        <label><input type="checkbox" id="s_about"> درباره ما</label>
+      </div>
+      <button id="saveMain">ذخیره تنظیمات</button>
+      <p class="msg" id="mainMsg"></p>
+    </section>
+
+    <section class="box">
+      <h2>افزودن نمونه کار</h2>
+      <label>عنوان</label><input id="pTitle">
+      <label>توضیح</label><textarea id="pDesc"></textarea>
+      <label>لینک (اختیاری)</label><input id="pLink">
+      <label>ترتیب نمایش (عدد کوچک‌تر، جلوتر)</label><input id="pOrder" type="number" value="0">
+      <label>عکس (اختیاری)</label><input type="file" id="pFile" accept="image/*">
+      <button id="addProjectBtn">افزودن</button>
+      <p class="msg" id="pMsg"></p>
+    </section>
+
+    <section class="box">
+      <h2>مدیریت نمونه کارها</h2>
+      <div id="projectList"></div>
+    </section>
+
+    <section class="box">
+      <h2>پیام‌های دریافتی</h2>
+      <div id="messageList"></div>
+    </section>
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, doc, getDoc, setDoc, collection, getDocs, addDoc, updateDoc, deleteDoc, query, orderBy }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+  // ⚠️ همان مقادیر index.html
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "shadow-vic.firebaseapp.com",
+    projectId: "shadow-vic",
+    storageBucket: "shadow-vic.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+  };
+  const ADMIN_EMAIL = "im.victor.128@gmail.com";
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const auth = getAuth(app);
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s ?? "").replace(/[&<>"']/g, c =>
+    ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+
+  // ---------- فشرده‌سازی عکس ----------
+  function compressImage(file, maxW = 800, quality = 0.7) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onerror = reject;
+      reader.onload = () => {
+        const img = new Image();
+        img.onerror = reject;
+        img.onload = () => {
+          const scale = Math.min(1, maxW / img.width);
+          const canvas = document.createElement("canvas");
+          canvas.width = Math.round(img.width * scale);
+          canvas.height = Math.round(img.height * scale);
+          canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
+          resolve(canvas.toDataURL("image/jpeg", quality));
+        };
+        img.src = reader.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  // ---------- ورود / خروج ----------
+  $("loginBtn").addEventListener("click", async () => {
+    $("loginMsg").textContent = "در حال ورود...";
+    try {
+      await signInWithEmailAndPassword(auth, $("loginEmail").value.trim(), $("loginPass").value);
+      $("loginPass").value = "";
+      $("loginMsg").textContent = "";
+    } catch (e) {
+      console.error(e);
+      $("loginMsg").textContent = "ایمیل یا رمز اشتباه است.";
+    }
+  });
+  $("logoutBtn").addEventListener("click", () => signOut(auth));
+
+  onAuthStateChanged(auth, async (user) => {
+    const isAdmin = !!user && user.email === ADMIN_EMAIL;
+    $("loginBox").classList.toggle("hidden", isAdmin);if (e.target.classList.contains("save-p")) {
+      try {
+        await updateDoc(ref, {
+          title: item.querySelector(".e-title").value.trim(),
+          description: item.querySelector(".e-desc").value.trim(),
+          link: item.querySelector(".e-link").value.trim(),
+          order: Number(item.querySelector(".e-order").value) || 0,
+          visible: item.querySelector(".e-visible").checked
+        });
+        msg.textContent = "ذخیره شد ✅";
+      } catch (err) { console.error(err); msg.textContent = "خطا در ذخیره."; }
+    }
+
+    if (e.target.classList.contains("del-p")) {
+      if (!confirm("این نمونه کار حذف شود؟")) return;
+      try {
+        await deleteDoc(ref);
+        await loadProjectList();
+      } catch (err) { console.error(err); msg.textContent = "خطا در حذف."; }
+    }
+  });
+
+  // ---------- پیام‌ها ----------
+  async function loadMessageList() {
+    const snap = await getDocs(query(collection(db, "messages"), orderBy("createdAt", "desc")));
+    const list = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    $("messageList").innerHTML = list.length ? list.map(m => 
+      <div class="item" data-id="${m.id}">
+        <p><strong>${esc(m.name)}</strong> — <span class="small">${esc(m.email)}</span></p>
+        <p>${esc(m.text)}</p>
+        <button class="danger del-m">حذف</button>
+      </div>).join("") : <p class="small">پیامی وجود ندارد.</p>;
+  }
+
+  $("messageList").addEventListener("click", async (e) => {
+    if (!e.target.classList.contains("del-m")) return;
+    if (!confirm("پیام حذف شود؟")) return;
+    const id = e.target.closest(".item").dataset.id;
+    await deleteDoc(doc(db, "messages", id));
+    await loadMessageList();
+  });
+</script>
+</body>
+</html>
